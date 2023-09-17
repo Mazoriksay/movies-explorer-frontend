@@ -76,7 +76,8 @@
 }
 
 .auth__input:focus {
-    outline: none;
+    outline: 0;
+    box-shadow: 0 0 0 0.1rem rgba(60, 220, 132, 1);
 }
 
 .auth__error {

@@ -16,6 +16,7 @@
     min-height: 72px;
     border: 1.5px solid rgba(170, 170, 170, 0.2);
     border-radius: 8px;
+    transition: border 0.6s linear;
 }
 
 .search__input {
@@ -52,7 +53,11 @@
 }
 
 .search__input:focus {
-    outline: none;
+    outline: 0;
+}
+
+.search__container:focus-within {
+    border: 1.5px solid rgba(60, 220, 132, 1);
 }
 
 

@@ -14,8 +14,8 @@ function Navigation() {
 
     return (
         <>
-            <button className='navigation__btn' type='button' onClick={openSideBar}></button>
             <nav className='navigation'>
+                <button className='navigation__btn' type='button' onClick={openSideBar}></button>
                 <ul className='navigation__list'>
                     <li className='navigation__list-el'>
                         <Link to='/movies' className={'navigation__link navigation__link_type_movies' +
@@ -36,14 +36,14 @@ function Navigation() {
                         </Link>
                         <Link to='/profile' className='navigation__link'>
                             <div 
-                                className={'navigation__link_type_container-image' + (
+                                className={'navigation__link navigation__link_type_container-image' + (
                                 location.pathname === '/movies' ||
                                 location.pathname === '/saved-movies' ||
                                 location.pathname === '/profile' ? 
-                                ' navigation__link_type_container-image-black' : ''
+                                ' navigation__link navigation__link_type_container-image-black' : ''
                                 )}
                             >
-                                <img src={accImg} className='navigation__link_type_account-image' alt='Человечек'/>
+                                <img src={accImg} className='navigation__link navigation__link_type_account-image' alt='Человечек'/>
                             </div>
                         </Link>
                     </li>

@@ -91,7 +91,7 @@
     height: 16px;
 }
 
-.sidebar__link_type_container-image {
+.sidebar__img-container {
     display: flex;
     align-items: center;
     justify-content: center;

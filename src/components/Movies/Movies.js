@@ -95,7 +95,7 @@ function Movies() {
                     isSaved={true}
                 />
             </MoviesCardList>
-            {/* <button className='movies__btn'>Ещё</button> */}
+            <button className='movies__btn'>Ещё</button>
         </section>
     )
 }

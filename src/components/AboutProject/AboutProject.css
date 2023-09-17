@@ -23,6 +23,10 @@
     border-bottom: 1px solid #dadada;
 }
 
+.about__text-content:first-of-type {
+    margin-right: 40px;
+}
+
 .about__container {
     margin-top: 70px;
     display: flex;
@@ -135,6 +139,10 @@
 
     .about__line-text {
         width: 120px;
+    }
+
+    .about__text-content:first-of-type {
+        margin-right: 30px;
     }
 }
 

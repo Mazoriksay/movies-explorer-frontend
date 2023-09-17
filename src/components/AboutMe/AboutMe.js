@@ -14,7 +14,7 @@ function AboutMe() {
                         С недавних пор начал активно заниматься спортом, также увлекаюсь скейтбордингом и компьютерными играми.
                         После прохождения курса от Практикума полон энтузиазма и энергии, чтобы применить свои навыки и знания в реальных проектах.
                     </p>
-                    <a className='about-me__github' href='https://github.com/Mazoriksay'>GitHub</a>
+                    <a className='about-me__github' href='https://github.com/Mazoriksay' target='_blank'>GitHub</a>
                 </div>
                 <img className='about-me__image' src={me} alt='Я'/>
             </div>

@@ -86,6 +86,10 @@
     opacity: 0.7;
 }
 
+.about-me__text-container {
+    margin-right: 270px;
+}
+
 
 @media screen and (max-width: 768px) {
     .about-me__title {
@@ -124,9 +128,13 @@
         width: 255px;
         height: 307px;
     }
+
+    .about-me__text-container {
+        margin-right: 49px;
+    }
 }
 
-@media screen and (max-width: 320px) {
+@media screen and (max-width: 365px) {
     .about-me__title {
         margin-top: 70px;
         padding-bottom: 28px;
@@ -170,5 +178,9 @@
         width: 292px;
         height: 352px;
         order: -1;
+    }
+
+    .about-me__text-container {
+        margin-right: 0px;
     }
 }

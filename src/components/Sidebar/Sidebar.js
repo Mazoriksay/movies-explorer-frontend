@@ -33,8 +33,8 @@ function Sidebar({ isOpen, onClose }) {
                         Аккаунт
                     </Link>
                     <Link to='/profile' className='sidebar__link'>
-                        <div className='sidebar__link_type_container-image'>
-                            <img src={accImg} className='sidebar__link_type_account-image' alt="Человечек"/>
+                        <div className='sidebar__img-container'>
+                            <img src={accImg} className='sidebar__link sidebar__link_type_account-image' alt="Человечек"/>
                         </div>
                     </Link>
                 </div>
