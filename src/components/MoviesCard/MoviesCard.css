@@ -43,6 +43,7 @@
 .movie-card__img {
     width: 360px;
     height: 200px;
+    cursor: pointer;
 }
 
 .movie-card__btn {
@@ -72,7 +73,7 @@
     background: url('../../images/btn-saved-movie.svg');
 }
 
-@media screen and (max-width: 1150px) {
+@media screen and (max-width: 1200px) {
     .movie-card {
         width: 342px;
         height: 309px;
@@ -89,7 +90,7 @@
 
 }
 
-@media screen and (max-width: 710px) {
+@media screen and (max-width: 760px) {
     .movie-card {
         width: 299px;
         height: 271px;
