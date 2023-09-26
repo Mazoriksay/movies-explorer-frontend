@@ -26,10 +26,9 @@ function Login({ handleLogin }) {
             return;
         }
         api.authorize(formValue).then(() => {
-            handleLogin(formValue.email);
+            handleLogin();
             setFormValue({email: '', password: ''});
-            navigate('/', {replace: true});   
-     
+            navigate('/movies', {replace: true});   
         })
         .catch((err) => {
             console.log(err);

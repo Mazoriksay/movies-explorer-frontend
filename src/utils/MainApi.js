@@ -2,18 +2,18 @@ class Api {
     constructor({ baseUrl, headers }){
         this._baseUrl = baseUrl;
         this._headers = headers;
-    }
+    };
 
     _checkStatus(res) {
         if (res.ok) {
             return res.json();
         }
         return Promise.reject(`Ошибка: ${res.status}`);
-    }
+    };
 
     _request(url, options) {
         return fetch(this._baseUrl + url, options).then(this._checkStatus);
-    }
+    };
 
     checkToken() {
         return this._request(`/users/me`, {
@@ -23,14 +23,14 @@ class Api {
                 ...this._headers,
             }
         });
-    }
+    };
 
     getUserInfo() {
         return this._request(`/users/me`, {
             credentials: 'include',
             headers: this._headers
         });
-    }
+    };
 
     register({name, email, password}) {
         return this._request('/signup', {
@@ -39,7 +39,7 @@ class Api {
             headers: this._headers,
             body: JSON.stringify({name, email, password}) 
         });
-    }
+    };
 
     authorize({email, password}) {
         return this._request('/signin', {
@@ -51,7 +51,15 @@ class Api {
         .then(({data}) => {
             localStorage.setItem('userId', data._id); 
         })
+        .catch((err) => console.log(err));
     }
+
+    signOut() {
+        return this._request('/signout', {
+            credentials: 'include',
+            headers: this._headers,
+        });
+    };
 
     setProfileInfo({name, email}) {
         return this._request(`/users/me`, {
@@ -69,8 +77,8 @@ class Api {
         return this._request(`/movies`, {
             credentials: 'include',
             headers: this._headers
-        })
-    }
+        });
+    };
     
     addNewMovies(movieBody) {
         return this._request(`/movies`, {
@@ -81,7 +89,7 @@ class Api {
                 ...movieBody,
             })
         });
-    }
+    };
 
     deleteMovies(id) {
         return this._request(`/movies/${id}`, {
@@ -89,8 +97,7 @@ class Api {
             credentials: 'include',
             headers: this._headers
         });
-    }
-
+    };
 
 }
 

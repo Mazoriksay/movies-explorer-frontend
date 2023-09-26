@@ -1,6 +1,6 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import Header from '../Header/Header';
 import Main from '../Main/Main';
@@ -75,8 +75,13 @@ function App() {
     }
 
     const signOut = () => {
-        localStorage.removeItem('userId');
-        setIsLoggedIn(false);
+        api.signOut()
+        .then(() => {
+            setIsLoggedIn(false);
+            localStorage.clear();
+            navigate('/');
+        })
+        .catch((err) => console.log(err));
     }
 
     return (
@@ -98,13 +103,21 @@ function App() {
                     />
                     <Route
                         path='/sign-up'
-                        element={<Register/>}
+                        element={!isLoggedIn 
+                                    ? 
+                                    <Register handleLogin={handleLogin} /> 
+                                    : 
+                                    <Navigate to='/movies' />
+                                }
                     />
                     <Route
                         path='/sign-in'
-                        element={<Login
-                                    handleLogin={handleLogin}
-                                />}
+                        element={!isLoggedIn 
+                                    ?
+                                    <Login handleLogin={handleLogin} />
+                                    :
+                                    <Navigate to='/movies' />
+                                }
                     />
                     <Route
                         path='/profile'

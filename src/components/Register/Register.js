@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../utils/MainApi';
 
-function Register() {
+function Register({ handleLogin }) {
     const navigate = useNavigate();
     
     const [formValue, setFormValue] = useState({
@@ -23,8 +23,13 @@ function Register() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        api.register(formValue).then(() => {
-            navigate('/sign-in', {replace:true});
+        api.register(formValue).
+        then(() => {
+            api.authorize(formValue).then(() => {
+                handleLogin();
+                setFormValue({email: '', password: '', name: ''});
+                navigate('/movies', {replace: true});
+            })
         })
         .catch(() => {
             setIsValid(false);

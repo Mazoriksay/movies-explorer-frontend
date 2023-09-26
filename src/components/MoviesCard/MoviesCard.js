@@ -1,16 +1,16 @@
 import './MoviesCard.css';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import convertDuration from '../../utils/convertDuration';
 
 function MoviesCard({ movie, onSave, onDelete, savedMovies }) {
-
+    const [isSaved, setIsSaved] = useState(savedMovies.some((savedMovie) => savedMovie.movieId === movie.id));
     const location = useLocation();
 
 
-    const isSaved = savedMovies.some((savedMovie) => savedMovie.movieId === movie.id);
-
-
     const {hours, minutes} =  convertDuration(movie.duration);
+
+    const savedServerMovie = savedMovies.filter((savedMovie) => savedMovie.movieId === movie.id);
 
     const convertImage = () => {
         if (location.pathname === '/movies') {
@@ -21,6 +21,7 @@ function MoviesCard({ movie, onSave, onDelete, savedMovies }) {
     };
 
     const image = convertImage();
+
 
     const savedMovie = {
         country: movie.country || 'Нет данных',
@@ -36,15 +37,24 @@ function MoviesCard({ movie, onSave, onDelete, savedMovies }) {
         movieId: movie.id,
     };
 
-    const handleSaveClick = () => {
-        onSave(savedMovie);
-    };
 
     const handleDeleteClick = () => {
         onDelete(movie);
     };
 
+    const handleSaveClick = () => {
+        onSave(savedMovie);
+    };
 
+    const handleLikeClick = () => {
+        if (isSaved) {
+            onDelete(savedServerMovie[0]);
+            setIsSaved(false);
+        } else {
+            handleSaveClick();
+            setIsSaved(true);
+        }
+    }
 
     return(
         <li className='movie-card'>
@@ -53,13 +63,13 @@ function MoviesCard({ movie, onSave, onDelete, savedMovies }) {
                 <p className='movie-card__duration'>{hours}ч {minutes}м</p>
             </div>
             <img 
-                 onClick={event =>  window.open(`${movie.trailerLink}`, '_blank')}
+                onClick={e =>  window.open(`${movie.trailerLink}`, '_blank')}
                 className='movie-card__img' 
                 src={ image } 
                 alt={ movie.nameRU }
             />
             {location.pathname === '/movies' ?
-                <button type='button' className={isSaved ? 'movie-card__btn movie-card__btn_type_saved'  : 'movie-card__btn'}  onClick={handleSaveClick} disabled={isSaved}>
+                <button type='button' className={isSaved ? 'movie-card__btn movie-card__btn_type_saved'  : 'movie-card__btn'}  onClick={handleLikeClick}>
                 {!isSaved ? 'Сохранить' : ''}</button>
                 : 
                 <button className='movie-card__btn movie-card__btn_type_krest' type='button' onClick={handleDeleteClick}></button>

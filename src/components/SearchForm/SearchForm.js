@@ -1,9 +1,17 @@
 import './SearchForm.css';
 import { useRef, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 function SearchForm({ handleCheckboxChange, checked, handleSearch, setIsSearch, inputText }) {
     const inputRef = useRef();
+    const location = useLocation();
     const [textForm, setTextForm] = useState('');
+
+    useEffect(() => {
+        if (location.pathname === '/saved-movies') {
+            setTextForm('');
+        }
+    }, [location]);
 
     useEffect(() => {
         if (inputText) {
@@ -17,7 +25,9 @@ function SearchForm({ handleCheckboxChange, checked, handleSearch, setIsSearch, 
         e.preventDefault()
         const searchText = inputRef.current.value;
         setIsSearch(true);
-        localStorage.setItem('search-text', JSON.stringify(searchText));
+        if (location.pathname === '/movies') {
+            localStorage.setItem('search-text', JSON.stringify(searchText));
+        } 
         handleSearch(searchText);
     }
     

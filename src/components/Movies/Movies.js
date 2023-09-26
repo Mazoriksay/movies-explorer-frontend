@@ -20,9 +20,12 @@ function Movies({ isLoggedIn }) {
     const [moviesToLoad, setMoviesToLoad] = useState(0);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [showMore, setShowMore] = useState(false);
-    const [isChecked, setIsChecked] = useState(false);
-    const [isSearch, setIsSearch] = useState(false);
-    const [inputText, setInputText] = useState('');
+    const [isMovieChecked, setIsMovieChecked] = useState(false);
+    const [movieInputText, setMovieInputText] = useState('');
+    const [isMovieSearch, setIsMovieSearch] = useState(false);
+    const [isSavedChecked, setIsSavedChecked] = useState(false);
+    const [savedInputText, setSavedInputText] = useState('');
+    const [isSavedSearch, setIsSavedSearch] = useState(false);
     const location = useLocation();
 
     useEffect(() => {
@@ -30,19 +33,15 @@ function Movies({ isLoggedIn }) {
         setIsLoading(true);
         moviesApi.getMovies()
         .then((res) => {
-            setIsChecked(JSON.parse(localStorage.getItem('checkbox')));
-            setInputText(JSON.parse(localStorage.getItem('search-text')));
+            setIsMovieChecked(JSON.parse(localStorage.getItem('checkbox')));
+            setMovieInputText(JSON.parse(localStorage.getItem('search-text')));
             setMovies(res);
         })
         .catch((err) => console.log(err))
         .finally(() => {
             setIsLoading(false);
         });
-        
-    }, [isLoggedIn])
 
-    useEffect(() => {
-        if (!isLoggedIn) return;
         setIsLoading(true);
         api.getInitialMovies()
         .then((res) => {
@@ -77,10 +76,10 @@ function Movies({ isLoggedIn }) {
         api.deleteMovies(movie._id)
         .then(() => {
             setSavedMovies((state) => state.filter((item) => item._id !== movie._id));
+            setSearchSavedMovies((state) => state.filter((item) => item._id !== movie._id));
         })
         .catch((err) => {
             console.log(err);
-            console.log(movie);
         })
 
     }
@@ -89,6 +88,7 @@ function Movies({ isLoggedIn }) {
         api.addNewMovies(movie)
         .then((res) => {
             setSavedMovies([res, ...savedMovies]);
+            setSearchSavedMovies([res, ...searchSavedMovies]);
         })
         .catch((err) => console.log(err));
     } 
@@ -124,23 +124,41 @@ function Movies({ isLoggedIn }) {
     };
 
     const handleMovies = (movies) => {
-        if (isChecked) {
-            return filteredMoviesByDuration(movies);
-        } else if (!isChecked) {
-            return movies;
-        };
+        if (location.pathname === '/movies') {
+            if (isMovieChecked) {
+                return filteredMoviesByDuration(movies);
+            } else if (!isMovieChecked) {
+                return movies;
+            };
+    
+            if (isMovieSearch) {
+                setIsMovieSearch(false);
+            };
+        } else if (location.pathname === '/saved-movies') {
+            if (isSavedChecked) {
+                return filteredMoviesByDuration(movies);
+            } else if (!isSavedChecked) {
+                return movies;
+            };
+    
+            if (isSavedSearch) {
+                setIsSavedSearch(false);
+            };
+        }
 
-        if (isSearch) {
-            setIsSearch(false);
-        };
-    };
+    }
 
-    const moviesElements = isSearch ? handleMoviesMap(handleMovies(searchMovies)) : handleMoviesMap(handleMovies(movies));
-    const savedElements = isSearch  ? handleMoviesMap(handleMovies(searchSavedMovies)) : handleMoviesMap(handleMovies(savedMovies));
+    const moviesElements = isMovieSearch ? handleMoviesMap(handleMovies(searchMovies)) : handleMoviesMap(handleMovies(movies));
+    const savedElements = isSavedSearch  ? handleMoviesMap(handleMovies(searchSavedMovies)) : handleMoviesMap(handleMovies(savedMovies));
 
     const handleCheckboxChange = () => {
-        setIsChecked(!isChecked);
-        localStorage.setItem('checkbox', !isChecked)
+        if (location.pathname === '/movies') {
+            setIsMovieChecked(!isMovieChecked);
+            localStorage.setItem('checkbox', !isMovieChecked)
+        } else if (location.pathname === '/saved-movies') {
+            setIsSavedChecked(!isSavedChecked);
+        }
+        
     };
 
     const updateWindowWidth = () => {
@@ -155,27 +173,57 @@ function Movies({ isLoggedIn }) {
     
     return (
         <section className='movies'>
-            <SearchForm  handleCheckboxChange={handleCheckboxChange} checked={isChecked} handleSearch={handleSearch} setIsSearch={setIsSearch} inputText={inputText}/>
-            {!isLoading && (location.pathname === '/movies' ? (moviesElements.length === 0) : (savedElements.length === 0 )) &&
-            <p className='movies__text-not-found'>Ничего не найдено</p>}
+            <SearchForm  
+                handleCheckboxChange={handleCheckboxChange} 
+                checked={location.pathname === '/movies' ? isMovieChecked : isSavedChecked} 
+                handleSearch={handleSearch} 
+                setIsSearch={location.pathname === '/movies' ? setIsMovieSearch : setIsSavedSearch} 
+                inputText={location.pathname ==='/movies' ? movieInputText : savedInputText}
+            />
+            {!isLoading && 
+                (location.pathname === '/movies' 
+                    ? 
+                    (moviesElements.length === 0) 
+                    : 
+                    (savedElements.length === 0 )
+                ) &&
+                <p className='movies__text-not-found'>
+                    Ничего не найдено
+                </p>
+            }
             
             {!isLoading ?
                     <MoviesCardList>
-                        {location.pathname === '/movies' ? moviesElements.slice(0, moviesNum) : savedElements.slice(0, moviesNum)} 
-                        {location.pathname === '/movies' ? showMore && moviesElements.slice(moviesNum, moviesNum) : showMore && savedElements.slice(moviesNum, moviesNum)}
+                        {location.pathname === '/movies' 
+                            ? 
+                            moviesElements.slice(0, moviesNum) 
+                            : 
+                            savedElements.slice(0, moviesNum)
+                        } 
+                        {location.pathname === '/movies' 
+                            ? 
+                            (showMore && moviesElements.slice(moviesNum, moviesNum))
+                            : 
+                            (showMore && savedElements.slice(moviesNum, moviesNum))
+                        }
                     </MoviesCardList>
                     :   
                     <Preloader />
-                }
-              {!isLoading && (location.pathname === '/movies' ? 
-              ((moviesElements.length > 0 ) && (moviesElements.length > moviesNum)) : 
-              ((savedElements.length > 0 ) && (savedElements.length > moviesNum))) &&
-                 <button 
+            }
+            {!isLoading && 
+                (location.pathname === '/movies' 
+                    ? 
+                    ((moviesElements.length > 0 ) && (moviesElements.length > moviesNum)) 
+                    : 
+                    ((savedElements.length > 0 ) && (savedElements.length > moviesNum))
+                ) &&
+                <button 
                     className='movies__btn'
                     onClick={handleShowMore}
-                 >
+                >
                     Ещё
-                 </button>}
+                </button>
+            }
         </section>
     )
 }
