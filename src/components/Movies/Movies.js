@@ -101,7 +101,6 @@ function Movies({ isLoggedIn }) {
                         key={movie.id || movie.movieId}
                     /> 
         });
-        console.log('handleMoviesMap',list);
         return list
     };
 
@@ -126,7 +125,6 @@ function Movies({ isLoggedIn }) {
             if (isMovieChecked) {
                 return filteredMoviesByDuration(movies);
             } else if (!isMovieChecked) {
-                console.log(movies);
                 return movies;
             };
         } else if (location.pathname === '/saved-movies') {
