@@ -2,21 +2,27 @@ import './SearchForm.css';
 import { useRef, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-function SearchForm({ handleCheckboxChange, checked, handleSearch, setIsSearch, inputText }) {
+function SearchForm({ handleCheckboxChange, checked, handleSearch, setIsSavedSearch, setIsMovieSearch, inputText}) {
     const inputRef = useRef();
     const location = useLocation();
+    const [savedTextForm, setSavedTextForm] = useState('');
     const [textForm, setTextForm] = useState('');
-
+    
     useEffect(() => {
         if (location.pathname === '/saved-movies') {
-            setTextForm('');
+            setSavedTextForm('');
+            handleSearch('');
+        } else if (location.pathname === 'movies') {
+            const text = JSON.parse(localStorage.getItem('search-text'));
+            setIsMovieSearch(text);
+            handleSearch(text)
         }
     }, [location]);
 
     useEffect(() => {
         if (inputText) {
+            setIsMovieSearch(true);
             setTextForm(inputText);
-            setIsSearch(true);
             handleSearch(inputText);
         }
     }, [inputText]);
@@ -24,15 +30,21 @@ function SearchForm({ handleCheckboxChange, checked, handleSearch, setIsSearch, 
     const handleSubmit = (e) => {
         e.preventDefault()
         const searchText = inputRef.current.value;
-        setIsSearch(true);
         if (location.pathname === '/movies') {
             localStorage.setItem('search-text', JSON.stringify(searchText));
-        } 
+            setIsMovieSearch(true);
+        } else if (location.pathname === '/saved-movies') {
+            setIsSavedSearch(true);
+        }
         handleSearch(searchText);
     }
-    
+
     const handleChange = () => {
-        setTextForm(inputRef.current.value)
+        if (location.pathname === '/saved-movies') {
+            setSavedTextForm(inputRef.current.value);
+        } else if (location.pathname === '/movies') {
+            setTextForm(inputRef.current.value);
+        }
     }
     
     return(
@@ -46,7 +58,7 @@ function SearchForm({ handleCheckboxChange, checked, handleSearch, setIsSearch, 
                     placeholder='Фильмы' 
                     minLength='0'
                     maxLength='40'
-                    value={textForm}
+                    value={location.pathname === '/movies' ? textForm : savedTextForm}
                     onChange={handleChange}
                 >
                 </input>

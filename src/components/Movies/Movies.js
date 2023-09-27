@@ -24,10 +24,9 @@ function Movies({ isLoggedIn }) {
     const [movieInputText, setMovieInputText] = useState('');
     const [isMovieSearch, setIsMovieSearch] = useState(false);
     const [isSavedChecked, setIsSavedChecked] = useState(false);
-    const [savedInputText, setSavedInputText] = useState('');
     const [isSavedSearch, setIsSavedSearch] = useState(false);
     const location = useLocation();
-
+    
     useEffect(() => {
         if (!isLoggedIn) return;
         setIsLoading(true);
@@ -88,11 +87,9 @@ function Movies({ isLoggedIn }) {
         api.addNewMovies(movie)
         .then((res) => {
             setSavedMovies([res, ...savedMovies]);
-            setSearchSavedMovies([res, ...searchSavedMovies]);
         })
         .catch((err) => console.log(err));
     } 
-
 
     const handleMoviesMap = (moviesList) => {
         const list = moviesList.map((movie) => {
@@ -101,9 +98,10 @@ function Movies({ isLoggedIn }) {
                         onSave={handleMovieSave}
                         onDelete={handleMovieDelete}
                         savedMovies={savedMovies}
+                        key={movie.id || movie.movieId}
                     /> 
         });
-
+        console.log('handleMoviesMap',list);
         return list
     };
 
@@ -128,11 +126,8 @@ function Movies({ isLoggedIn }) {
             if (isMovieChecked) {
                 return filteredMoviesByDuration(movies);
             } else if (!isMovieChecked) {
+                console.log(movies);
                 return movies;
-            };
-    
-            if (isMovieSearch) {
-                setIsMovieSearch(false);
             };
         } else if (location.pathname === '/saved-movies') {
             if (isSavedChecked) {
@@ -140,12 +135,7 @@ function Movies({ isLoggedIn }) {
             } else if (!isSavedChecked) {
                 return movies;
             };
-    
-            if (isSavedSearch) {
-                setIsSavedSearch(false);
-            };
         }
-
     }
 
     const moviesElements = isMovieSearch ? handleMoviesMap(handleMovies(searchMovies)) : handleMoviesMap(handleMovies(movies));
@@ -158,7 +148,6 @@ function Movies({ isLoggedIn }) {
         } else if (location.pathname === '/saved-movies') {
             setIsSavedChecked(!isSavedChecked);
         }
-        
     };
 
     const updateWindowWidth = () => {
@@ -169,7 +158,6 @@ function Movies({ isLoggedIn }) {
         setShowMore(true);
         setMoviesNum(moviesNum + moviesToLoad);
     };
-
     
     return (
         <section className='movies'>
@@ -177,8 +165,9 @@ function Movies({ isLoggedIn }) {
                 handleCheckboxChange={handleCheckboxChange} 
                 checked={location.pathname === '/movies' ? isMovieChecked : isSavedChecked} 
                 handleSearch={handleSearch} 
-                setIsSearch={location.pathname === '/movies' ? setIsMovieSearch : setIsSavedSearch} 
-                inputText={location.pathname ==='/movies' ? movieInputText : savedInputText}
+                setIsMovieSearch={setIsMovieSearch} 
+                setIsSavedSearch={setIsSavedSearch}
+                inputText={location.pathname ==='/movies' ? movieInputText : ''}
             />
             {!isLoading && 
                 (location.pathname === '/movies' 

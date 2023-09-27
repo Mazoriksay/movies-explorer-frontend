@@ -4,11 +4,10 @@ import { useLocation } from 'react-router-dom';
 import convertDuration from '../../utils/convertDuration';
 
 function MoviesCard({ movie, onSave, onDelete, savedMovies }) {
-    const [isSaved, setIsSaved] = useState(savedMovies.some((savedMovie) => savedMovie.movieId === movie.id));
     const location = useLocation();
 
 
-    const {hours, minutes} =  convertDuration(movie.duration);
+    const {hours, minutes} = convertDuration(movie.duration);
 
     const savedServerMovie = savedMovies.filter((savedMovie) => savedMovie.movieId === movie.id);
 
@@ -20,8 +19,11 @@ function MoviesCard({ movie, onSave, onDelete, savedMovies }) {
         }
     };
 
-    const image = convertImage();
 
+    const isSaved = savedMovies.some((savedMovie) => savedMovie.movieId === movie.id);
+    console.log()
+
+    const image = convertImage();
 
     const savedMovie = {
         country: movie.country || 'Нет данных',
@@ -49,10 +51,8 @@ function MoviesCard({ movie, onSave, onDelete, savedMovies }) {
     const handleLikeClick = () => {
         if (isSaved) {
             onDelete(savedServerMovie[0]);
-            setIsSaved(false);
         } else {
             handleSaveClick();
-            setIsSaved(true);
         }
     }
 
