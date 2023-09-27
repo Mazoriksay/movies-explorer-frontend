@@ -52,6 +52,10 @@ function Movies({ isLoggedIn }) {
         });
         
     }, [isLoggedIn])
+
+    useEffect(() => {
+        setIsSavedChecked(false);
+    }, [location]);
     
     useEffect(() => {
         if (windowWidth <= widthMovies.WIDTH_760) {
