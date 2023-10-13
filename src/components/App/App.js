@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
+import { useState, useEffect } from 'react';
+import { Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import Header from '../Header/Header';
 import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
@@ -9,63 +10,157 @@ import Register from '../Register/Register';
 import Login from '../Login/Login';
 import Profile from '../Profile/Profile';
 import Movies from '../Movies/Movies';
-import SavedMovies from '../SavedMovies/SavedMovies';
+import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
+import { api } from '../../utils/MainApi';
 
 function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [currentUser, setCurrentUser] = useState({});
+    const [isValidProfile, setIsValidProfile] = useState(true);
+    const [submitText, setSubmitText] = useState('');
     const location = useLocation();
-    return (
-        <div className="App">
-            { 
-                location.pathname === '/' || 
-                location.pathname === '/movies' || 
-                location.pathname === '/saved-movies' || 
-                location.pathname === '/profile' 
-                ? 
-                <Header isLoggedIn={isLoggedIn} /> 
-                : ''
-            }
-            <Routes>
-                <Route 
-                    path='/'
-                    element={<Main/>} 
-                />
-                <Route
-                    path='/signup'
-                    element={<Register/>}
-                />
-                <Route
-                    path='/signin'
-                    element={<Login/>}
-                />
-                <Route
-                    path='/profile'
-                    element={<Profile />}
-                />
-                <Route 
-                    path='/movies'
-                    element={<Movies />}
-                />
-                <Route
-                    path='/saved-movies'
-                    element={<SavedMovies />}
-                />
-                <Route 
-                    path='*'
-                    element={<PageNotFound/>}
-                />
-            </Routes>
+    const navigate = useNavigate();
 
-            { 
-                location.pathname === '/' || 
-                location.pathname === '/movies' || 
-                location.pathname === '/saved-movies' || 
-                location.pathname === 'profile' 
-                ? 
-                <Footer />
-                : ''
-            }
-        </div>
+    useEffect(() => {
+        if (!isLoggedIn) return;
+        api.getUserInfo()
+        .then((res) => {
+            setCurrentUser(res);
+        })
+        .catch((err) => console.log(err))
+    }, [isLoggedIn])
+    
+
+    useEffect(() => {
+        handleTokenCheck();
+    }, []);
+
+    useEffect(() => {
+        if (isValidProfile) {
+            setSubmitText('');
+        }
+    }, [isValidProfile]);
+
+    const handleTokenCheck = () => {
+        const jwt = localStorage.getItem('userId');
+        if (jwt) {
+            api.checkToken(jwt).then((res) => {
+                if (res) {
+                    setIsLoggedIn(true);
+                    navigate(location.pathname, {replace: true});
+                }
+            })
+            .catch((err) => {
+                setIsLoggedIn(false);
+                console.log(err);
+            });
+        }
+    }
+
+    const handleLogin = () => {
+        setIsLoggedIn(true);
+    }
+
+    const handleUpdateUser = (data) => {
+        api.setProfileInfo(data)
+        .then((res) => {
+            setCurrentUser(res);
+            setSubmitText('Данные профиля успешно обновлены!');
+        })
+        .catch((err) => {
+            setIsValidProfile(false);
+            setSubmitText('При обновлении профиля произошла ошибка.');
+            console.log(err);
+        });
+    }
+
+    const signOut = () => {
+        api.signOut()
+        .then(() => {
+            setIsLoggedIn(false);
+            localStorage.clear();
+            navigate('/');
+        })
+        .catch((err) => console.log(err));
+    }
+
+    return (
+        <CurrentUserContext.Provider value={currentUser}>
+            <div className="App">
+                { 
+                    location.pathname === '/' || 
+                    location.pathname === '/movies' || 
+                    location.pathname === '/saved-movies' || 
+                    location.pathname === '/profile' 
+                    ? 
+                    <Header isLoggedIn={isLoggedIn} /> 
+                    : ''
+                }
+                <Routes>
+                    <Route 
+                        path='/'
+                        element={<Main/>} 
+                    />
+                    <Route
+                        path='/sign-up'
+                        element={!isLoggedIn 
+                                    ? 
+                                    <Register handleLogin={handleLogin} /> 
+                                    : 
+                                    <Navigate to='/movies' />
+                                }
+                    />
+                    <Route
+                        path='/sign-in'
+                        element={!isLoggedIn 
+                                    ?
+                                    <Login handleLogin={handleLogin} />
+                                    :
+                                    <Navigate to='/movies' />
+                                }
+                    />
+                    <Route
+                        path='/profile'
+                        element={<ProtectedRoute 
+                                    element={Profile}
+                                    isLoggedIn={isLoggedIn}
+                                    onSignOut={signOut}
+                                    handleUpdateUser={handleUpdateUser}
+                                    isValid={isValidProfile}
+                                    submitText={submitText}
+                                />}
+                    />
+                    <Route 
+                        path='/movies'
+                        element={<ProtectedRoute 
+                                    element={Movies}
+                                    isLoggedIn={isLoggedIn}
+                                />}
+                    />
+                    <Route
+                        path='/saved-movies'
+                        element={<ProtectedRoute 
+                                    element={Movies}
+                                    isLoggedIn={isLoggedIn}
+                                />}
+                    />
+                    <Route 
+                        path='*'
+                        element={<PageNotFound/>}
+                    />
+                </Routes>
+
+                { 
+                    location.pathname === '/' || 
+                    location.pathname === '/movies' || 
+                    location.pathname === '/saved-movies' || 
+                    location.pathname === 'profile' 
+                    ? 
+                    <Footer />
+                    : ''
+                }
+            </div>
+        </CurrentUserContext.Provider>
     );
 }
 
